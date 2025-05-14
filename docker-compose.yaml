@@ -1,0 +1,51 @@
+volumes:
+  postgres_data:
+  elastic_data:
+
+services:
+
+  postgres:
+    image: postgres:17-alpine
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+
+    volumes:
+       - ${POSTRES_VOL}
+
+  elasticsearch:
+    image: elasticsearch:9.0.1
+    env_file: .env
+    environment:
+      discovery.type: ${DISCOVERY_TYPE}
+      xpack.security.enabled: ${SECURITY_MODE}
+      xpack.security.http.ssl.enabled: 'false'
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      bootstrap.memory_lock: 'true' # required
+      cluster.name: ${CLUSTER_NAME} # required
+
+    ports:
+       - '${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}'
+
+    volumes:
+       - ${ELASTICSEARCH_VOL}
+
+  app:
+    build: .
+    depends_on:
+       - postgres
+       - elasticsearch
+    env_file: .env
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    environment:
+      PYTHONUNBUFFERED: '1'
+    restart: unless-stopped
