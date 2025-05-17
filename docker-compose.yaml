@@ -16,7 +16,7 @@ services:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
 
     volumes:
-       - ${POSTRES_VOL}
+       - ${POSTGRES_VOL}
 
   elasticsearch:
     image: elasticsearch:9.0.1
