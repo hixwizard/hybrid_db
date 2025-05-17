@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.postgres.models import Book as BookModel
@@ -13,7 +14,12 @@ async def create_book(db: AsyncSession, book: BookCreate):
     return db_book
 
 
-# TODO: сделать get_book_or_404
 async def get_book(db: AsyncSession, id: int):
     """Получение объекта книги."""
     return await db.get(BookModel, id)
+
+
+async def get_books(db: AsyncSession):
+    """Получение всех объектов книг."""
+    res = await db.execute(select(BookModel))
+    return res.scalars().all()
